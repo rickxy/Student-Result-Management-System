@@ -1,0 +1,115 @@
+{% extends 'layouts/base.html' %}{% load static %}{% block content %}
+<style>
+    main {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+    }
+    
+    #logo-img {
+        height: 11em;
+        width: 11em;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+</style>
+<div class="d-flex flex-column w-100 justify-content-center align-items-center">
+    <div class="mb-2">
+        <center>
+            <img src="{{ MEDIA_URL }}/default/logo.png" alt="System Logo" class="bg-gradient-light rounded-circle border-light border-2" id="logo-img">
+        </center>
+    </div>
+    <h3 class="fw-bolder text-center mb-3">{{ system_name }}</h3>
+    <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        <div class="card card-default rounded-0 shadow">
+            <div class="card-header">
+                <h4 class="card-title"><b>Login</b></h4>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <form id="login-user">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="username" class="control-label">Username</label>
+                            <input type="text" class="form-control rounded-0" autofocus name="username" id="username" required="required">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="password" class="control-label">Password</label>
+                            <input type="password" class="form-control rounded-0" name="password" id="password" required="required">
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="col-md-4">
+                                    <a href="javascript:void(0)" id="find_result">View Student Results</a>
+                                </div>
+                                <button class="btn btn-sm rounded-0 btn-primary">
+                                        Login
+                                    </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %} {% block javascripts %}
+<script>
+    $('#find_result').click(function() {
+        uni_modal('Select Student', '{% url "select-student" %}')
+    })
+    $(function() {
+        $('#login-user').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg text-light")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'login-user' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert_toast("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg")
+                        location.href = "{% url 'home-page' %}"
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>
+{% endblock javascripts %}

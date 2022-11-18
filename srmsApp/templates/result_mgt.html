@@ -1,0 +1,142 @@
+{% extends 'layouts/base.html' %} {% load humanize %} {% block content %}
+<div class="container-fluid">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card card-default rounded-0 shadow ">
+            <div class="card-header">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                    <h4 class="card-title fw-bold">Result List</h4>
+                    <div class="tools">
+                        <button type="button" class="btn btn-primary rounded-0 bg-gradient btn-sm" id='add_new'><i class="fa fa-plus"></i> Add New</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table class="table table-bordered" id="result-list">
+                        <colgroup>
+                            <col width="5%">
+                            <col width="15%">
+                            <col width="25%">
+                            <col width="25%">
+                            <col width="10%">
+                            <col width="10%">
+                            <col width="10%">
+                        </colgroup>
+                        <thead>
+                            <tr class="bg-gradient bg-primary bg-opacity-50 text-light">
+                                <th class="px-2 py-2 text-center">#</th>
+                                <th class="px-2 py-2 text-center">DateTime</th>
+                                <th class="px-2 py-2 text-center">Student</th>
+                                <th class="px-2 py-2 text-center">Semester</th>
+                                <th class="px-2 py-2 text-center">Subjects</th>
+                                <th class="px-2 py-2 text-center">Average</th>
+                                <th class="px-2 py-2 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr>
+                                <td class="px-2 py-1 align-middle text-center">{{ forloop.counter }}</td>
+                                <td class="px-2 py-1 align-middle">{{ result.date_created|date:"Y-m-d" }}</td>
+                                <td class="px-2 py-1 align-middle">{{ result.student }}</td>
+                                <td class="px-2 py-1 align-middle">{{ result.semester }}</td>
+                                <td class="px-2 py-1 align-middle text-end">{{ result.countSubjects|intcomma }}</td>
+                                <td class="px-2 py-1 align-middle text-end">{{ result.average|floatformat:2|intcomma }}</td>
+                                <td class="px-2 py-1 align-middle text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary btn-sm mb-0 rounded-0 dropdown-toggle" type="button" id="actionBtn-{{ result.pk }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="actionBtn-{{ result.pk }}">
+                                        <li><a class="dropdown-item view-data d-flex w-100 align-items-center" href="javascript:void(0)" data-url="{% url 'view-result-pk' result.pk %}"><i class="material-icons">preview</i> View</a></li>
+                                        <li><a class="dropdown-item edit-data d-flex w-100 align-items-center" href="javascript:void(0)" data-url="{% url 'manage-result-pk' result.pk %}"><i class="material-icons">edit</i> Edit</a></li>
+                                        <li><a class="dropdown-item delete-data d-flex w-100 align-items-center" href="javascript:void(0)" data-id="{{ result.pk }}"><i class="material-icons">delete</i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} {% block javascripts %}
+<script>
+    $(function() {
+        $('#add_new').click(function() {
+            uni_modal('<i class="fa fa-plus"></i> Add Result', '{% url "manage-result" %}', 'modal-xl')
+        })
+        $('.view-data').click(function() {
+            uni_modal('<i class="material-icons">preview</i> View Result Details', $(this).attr('data-url'), 'modal-xl')
+        })
+        $('.edit-data').click(function() {
+            uni_modal('<i class="fa fa-edit"></i> Edit Result', $(this).attr('data-url'), 'modal-xl')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this Result permanently?", "delete_result", [$(this).attr('data-id')])
+        })
+
+        $('#result-list').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: 6
+            }],
+            initComplete: function(settings, json) {
+                $('table td, table th').addClass('px-2 py-1')
+            },
+            drawCallback: function(settings) {
+                $('table td, table th').addClass('px-2 py-1')
+            },
+            language: {
+                paginate: {
+                    "first": "<i class='fa fa-step-backward'></i>",
+                    "last": "<i class='fa fa-step-previous'></i>",
+                    "next": "<i class='fa fa-angle-right'></i>",
+                    "previous": "<i class='fa fa-angle-left'></i>"
+                }
+            }
+        })
+    })
+
+    function delete_result($id) {
+        start_loader();
+        var _this = $(this)
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        $.ajax({
+            url: '{% url "delete-result" %}',
+            headers: {
+                'X-CSRFToken': "{{csrf_token}}"
+            },
+            method: 'POST',
+            data: {
+                id: $id
+            },
+            dataType: 'json',
+            error: err => {
+                console.log(err)
+                el.text('An error occurred.')
+                el.show('slow')
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.text('An error occurred.')
+                    el.show('slow')
+                } else {
+                    el.text('An error occurred.')
+                    el.show('slow')
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock javascripts %}

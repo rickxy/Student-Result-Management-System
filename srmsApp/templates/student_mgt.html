@@ -1,0 +1,143 @@
+{% extends 'layouts/base.html' %} {% load humanize %} {% block content %}
+<div class="container-fluid">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card card-default rounded-0 shadow ">
+            <div class="card-header">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                    <h4 class="card-title fw-bold">Student List</h4>
+                    <div class="tools">
+                        <button type="button" class="btn btn-primary rounded-0 bg-gradient btn-sm" id='add_new'><i class="fa fa-plus"></i> Add New</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table class="table table-bordered" id="student-list">
+                        <colgroup>
+                            <col width="5%">
+                            <col width="20%">
+                            <col width="25%">
+                            <col width="25%">
+                            <col width="15%">
+                            <col width="10%">
+                        </colgroup>
+                        <thead>
+                            <tr class="bg-gradient bg-primary bg-opacity-50 text-light">
+                                <th class="px-2 py-2 text-center">#</th>
+                                <th class="px-2 py-2 text-center">DateTime</th>
+                                <th class="px-2 py-2 text-center">Student ID</th>
+                                <th class="px-2 py-2 text-center">Name</th>
+                                <th class="px-2 py-2 text-center">Status</th>
+                                <th class="px-2 py-2 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td class="px-2 py-1 align-middle text-center">{{ forloop.counter }}</td>
+                                <td class="px-2 py-1 align-middle">{{ student.date_created|date:"Y-m-d" }}</td>
+                                <td class="px-2 py-1 align-middle">{{ student.student_id }}</td>
+                                <td class="px-2 py-1 align-middle">{{ student.get_name }}</td>
+                                <td class="px-1 py-1 align-middle text-center">
+                                    {% if student.status == '1' %}
+                                    <span class="badge bg-primary bg-gradient rounded-pill px-2">Active</span> {% else %}
+                                    <span class="badge bg-secondary bg-gradient rounded-pill px-2">Inactive</span> {% endif %}
+                                </td>
+                                <td class="px-2 py-1 align-middle text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary btn-sm mb-0 rounded-0 dropdown-toggle" type="button" id="actionBtn-{{ student.pk }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="actionBtn-{{ student.pk }}">
+                                        <li><a class="dropdown-item view-data d-flex w-100 align-items-center" href="javascript:void(0)" data-url="{% url 'view-student-pk' student.pk %}"><i class="material-icons">preview</i> View</a></li>
+                                        <li><a class="dropdown-item edit-data d-flex w-100 align-items-center" href="javascript:void(0)" data-url="{% url 'manage-student-pk' student.pk %}"><i class="material-icons">edit</i> Edit</a></li>
+                                        <li><a class="dropdown-item delete-data d-flex w-100 align-items-center" href="javascript:void(0)" data-id="{{ student.pk }}"><i class="material-icons">delete</i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} {% block javascripts %}
+<script>
+    $(function() {
+        $('#add_new').click(function() {
+            uni_modal('<i class="fa fa-plus"></i> Add student', '{% url "manage-student" %}', 'modal-md')
+        })
+        $('.view-data').click(function() {
+            uni_modal('<i class="material-icons">preview</i> View student Details', $(this).attr('data-url'), 'modal-md')
+        })
+        $('.edit-data').click(function() {
+            uni_modal('<i class="fa fa-edit"></i> Edit student', $(this).attr('data-url'), 'modal-md')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this student permanently?", "delete_student", [$(this).attr('data-id')])
+        })
+
+        $('#student-list').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: 5
+            }],
+            initComplete: function(settings, json) {
+                $('table td, table th').addClass('px-2 py-1')
+            },
+            drawCallback: function(settings) {
+                $('table td, table th').addClass('px-2 py-1')
+            },
+            language: {
+                paginate: {
+                    "first": "<i class='fa fa-step-backward'></i>",
+                    "last": "<i class='fa fa-step-previous'></i>",
+                    "next": "<i class='fa fa-angle-right'></i>",
+                    "previous": "<i class='fa fa-angle-left'></i>"
+                }
+            }
+        })
+    })
+
+    function delete_student($id) {
+        start_loader();
+        var _this = $(this)
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        $.ajax({
+            url: '{% url "delete-student" %}',
+            headers: {
+                'X-CSRFToken': "{{csrf_token}}"
+            },
+            method: 'POST',
+            data: {
+                id: $id
+            },
+            dataType: 'json',
+            error: err => {
+                console.log(err)
+                el.text('An error occurred.')
+                el.show('slow')
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.text('An error occurred.')
+                    el.show('slow')
+                } else {
+                    el.text('An error occurred.')
+                    el.show('slow')
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock javascripts %}

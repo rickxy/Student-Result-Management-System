@@ -1,0 +1,136 @@
+{% extends 'layouts/base.html' %} {% load humanize %} {% block content %}
+<div class="container-fluid">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card card-default rounded-0 shadow ">
+            <div class="card-header">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                    <h4 class="card-title fw-bold">Class List</h4>
+                    <div class="tools">
+                        <button type="button" class="btn btn-primary rounded-0 bg-gradient btn-sm" id='add_new'><i class="fa fa-plus"></i> Add New</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table class="table table-bordered" id="class-list">
+                        <colgroup>
+                            <col width="10%">
+                            <col width="20%">
+                            <col width="20%">
+                            <col width="20%">
+                            <col width="15%">
+                            <col width="15%">
+                        </colgroup>
+                        <thead>
+                            <tr class="bg-gradient bg-primary bg-opacity-50 text-light">
+                                <th class="px-2 py-2 text-center">#</th>
+                                <th class="px-2 py-2 text-center">Date/Time</th>
+                                <th class="px-2 py-2 text-center">Level</th>
+                                <th class="px-2 py-2 text-center">Section</th>
+                                <th class="px-2 py-2 text-center">Status</th>
+                                <th class="px-2 py-2 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for class in classes %}
+                            <tr>
+                                <td class="px-2 py-1 align-middle text-center">{{ forloop.counter }}</td>
+                                <td class="px-2 py-1 align-middle">{{ class.date_created|date:"Y-m-d h:i A" }}</td>
+                                <td class="px-2 py-1 align-middle">{{ class.level }}</td>
+                                <td class="px-2 py-1 align-middle text-end">{{ class.section }}</td>
+                                <td class="px-1 py-1 align-middle text-center">
+                                    {% if class.status == '1' %}
+                                    <span class="badge bg-primary bg-gradient rounded-pill px-2">Active</span> {% else %}
+                                    <span class="badge bg-secondary bg-gradient rounded-pill px-2">Inactive</span> {% endif %}
+                                </td>
+                                <td class="px-2 py-1 align-middle text-center">
+                                    <a class="btn btn-outline-primary btn-sm edit-data mb-0 border-info text-info px-3 py-1 rounded-0" href="javascript:void(0)" data-url="{% url 'manage-class-pk' class.pk %}" title="Edit">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger btn-sm delete-data mb-0 border-danger px-3 py-1 rounded-0" type="button" data-id="{{ class.pk }}" title="Delete">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} {% block javascripts %}
+<script>
+    $(function() {
+        $('#add_new').click(function() {
+            uni_modal('<i class="fa fa-plus"></i> Add Class', '{% url "manage-class" %}', 'modal-md')
+        })
+        $('.edit-data').click(function() {
+            uni_modal('<i class="fa fa-edit"></i> Edit Class', $(this).attr('data-url'), 'modal-md')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this Class permanently?", "delete_class", [$(this).attr('data-id')])
+        })
+
+        $('#class-list').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: 4
+            }],
+            initComplete: function(settings, json) {
+                $('table td, table th').addClass('px-2 py-1')
+            },
+            drawCallback: function(settings) {
+                $('table td, table th').addClass('px-2 py-1')
+            },
+            language: {
+                paginate: {
+                    "first": "<i class='fa fa-step-backward'></i>",
+                    "last": "<i class='fa fa-step-previous'></i>",
+                    "next": "<i class='fa fa-angle-right'></i>",
+                    "previous": "<i class='fa fa-angle-left'></i>"
+                }
+            }
+        })
+    })
+
+    function delete_class($id) {
+        start_loader();
+        var _this = $(this)
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        $.ajax({
+            url: '{% url "delete-class" %}',
+            headers: {
+                'X-CSRFToken': "{{csrf_token}}"
+            },
+            method: 'POST',
+            data: {
+                id: $id
+            },
+            dataType: 'json',
+            error: err => {
+                console.log(err)
+                el.text('An error occurred.')
+                el.show('slow')
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.text('An error occurred.')
+                    el.show('slow')
+                } else {
+                    el.text('An error occurred.')
+                    el.show('slow')
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock javascripts %}

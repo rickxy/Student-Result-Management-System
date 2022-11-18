@@ -1,0 +1,68 @@
+{% extends 'base.html' %}{% load static %}{% block pageContent %}
+<style>
+    main {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+    }
+</style>
+<div class="row justify-content-center">
+    <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+        <div class="card card-default rounded-0 shadow">
+            <div class="card-header">
+                <h4 class="card-title"><b>Create New User</b></h4>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <form id="register-user" method="POST" action="{% url 'register-user' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mdc-layout-grid">
+                            <div class="mdc-layout-grid__inner">
+                                <div class="form-group mb-3">
+                                    <label for="first_name" class="control-label">First Name</label>
+                                    <input type="text" class="form-control rounded-0" name="first_name" id="first_name" value="{{ reg_form.data.first_name }}" required="required">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="last_name" class="control-label">Last Name</label>
+                                    <input type="text" class="form-control rounded-0" name="last_name" id="last_name" value="{{ reg_form.data.last_name }}" required="required">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="email" class="control-label">Email</label>
+                                    <input type="email" class="form-control rounded-0" name="email" id="email" value="{{ reg_form.data.email }}" required="required">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="username" class="control-label">Username</label>
+                                    <input type="text" class="form-control rounded-0" name="username" id="username" value="{{ reg_form.data.username }}" required="required">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="password1" class="control-label">Password</label>
+                                    <input type="password" class="form-control rounded-0" name="password1" id="password1" value="{{ reg_form.data.password1 }}" required="required">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="password2" class="control-label">Confirm Password</label>
+                                    <input type="password" class="form-control rounded-0" name="password2" id="password2" value="{{ reg_form.data.password2 }}" required="required">
+                                </div>
+                                {% for field in reg_form %} {% for error in field.errors %}
+                                <div class="alert alert-danger my-2">
+                                    <p>{{ error }}</p>
+                                </div>
+                                {% endfor %} {% endfor %}
+                                <div class="form-group mb-3">
+                                    <div class="d-flex w-100 justify-content-end">
+                                        <button class="btn btn-sm rounded-0 btn-primary col-4">
+                                                Login
+                                            </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock pageContent %}

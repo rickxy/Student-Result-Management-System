@@ -1,0 +1,45 @@
+{% load customfilter %}
+<style>
+    #uni_modal .modal-footer {
+        display: none;
+    }
+</style>
+<div class="container-fluid">
+    <form action=" " id="student-form">
+        {% csrf_token %}
+        <div class="form-group mb-3 ">
+            <label for="student" class="control-label">Student</label>
+            <select name="student" id="student" class="form-select rounded-0" required>
+                {% if not  result.student %}
+                <option value="" disabled selected>Please Select Here</option>
+                {% endif %}
+                {% for stud in students %}
+                {% if result.student.id == stud.id %}
+                <option value="{{ stud.id }}" selected>{{ stud }}</option>
+                {% else %}
+                <option value="{{ stud.id }}">{{ stud }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    <div class="text-end">
+        <button class="btn btn-primary btn-sm rounded-0" form="student-form"><i class="fa fa-search"></i> Find Results</button>
+        <button class="btn btn-sm btn-flat btn-light border rounded-0" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+    </div>
+</div>
+<script>
+    $(function() {
+        $('#uni_modal').on('shown.bs.modal', function() {
+            $('#student').select2({
+                placeholder: "Please Select Student Here",
+                width: '100%',
+                dropdownParent: $('#uni_modal')
+            })
+        })
+        $('#student-form').submit(function(e) {
+            e.preventDefault();
+            location.href = '{% url "list-result" %}/' + $('#student').val()
+        })
+    })
+</script>

@@ -1,0 +1,218 @@
+{% load customfilter %}
+<div class="container-fluid">
+    <form action=" " id="result-form">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ result.id }}">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group mb-3 ">
+                    <label for="student" class="control-label">Student</label>
+                    <select name="student" id="student" class="form-select rounded-0" required>
+                        {% if not  result.student %}
+                        <option value="" disabled selected>Please Select Here</option>
+                        {% endif %}
+                        {% for stud in students %}
+                        {% if result.student.id == stud.id %}
+                        <option value="{{ stud.id }}" selected>{{ stud }}</option>
+                        {% else %}
+                        <option value="{{ stud.id }}">{{ stud }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group mb-3 ">
+                    <label for="semester" class="control-label">Semester</label>
+                    <input type="text" id="semester" name="semester" class="form-control form-control-sm py-1 rounded-0" value="{{ result.semester }}" required>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row align-items-end">
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="form-group mb-3 ">
+                    <label for="subject" class="control-label">Subject</label>
+                    <select name="subject" id="subject" class="form-select rounded-0">
+                        {% if not  student.subject %}
+                        <option value="" disabled selected>Please Select Here</option>
+                        {% endif %}
+                        {% for subject in subjects %}
+                        {% if student.subject.id == subject.id %}
+                        <option value="{{ subject.id }}" selected>{{ subject }}</option>
+                        {% else %}
+                        <option value="{{ subject.id }}">{{ subject }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="form-group mb-3 ">
+                    <label for="grade" class="control-label">Mark</label>
+                    <input type="number" step="any" id="grade" class="form-control form-control-sm py-1 rounded-0 text-end">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <button class="btn btn-primary btn-sm rounded-0 d-flex align-items-center" id="add_to_list" type="button"><span class="material-icons">add</span> Add to List</button>
+            </div>
+        </div>
+        <hr>
+        <table class="table table-bordered table-striped" id="marks-list">
+            <colgroup>
+                <col width="45%">
+                <col width="45%">
+                <col width="10%">
+            </colgroup>
+            <thead>
+                <tr class="bg-info bg-gradient">
+                    <th class="px-2 py-1 text-center">Subject</th>
+                    <th class="px-2 py-1 text-center">Mark</th>
+                    <th class="px-2 py-1 text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mark in marks %}
+                <tr>
+                    <td class="px-2 py-1 align-middle">
+                        <input type="hidden" name="subject[]" value="{{ mark.subject.id }}">
+                        <input type="hidden" name="grade[]" value="{{ mark.grade }}">
+                        <span class="subject_name">{{ mark.subject }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-end subject_mark align-middle">{{ mark.grade }}</td>
+                    <td class="px-2 py-1 text-center align-middle">
+                        <button class="btn btn-outline-danger mb-0 rounded-0 btn-sm rem-item py-1 px-3" type="button"><i class="fa fa-times"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="px-2 py-1"><b>Average</b></th>
+                    <th colspan="2" class="px-2 py-1 fw-bolder" id="average">0.00</th>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>
+<noscript id="mark-item-clone">
+<tr>
+    <td class="px-2 py-1 align-middle">
+        <input type="hidden" name="subject[]" value="">
+        <input type="hidden" name="grade[]" value="">
+        <span class="subject_name"></span>
+    </td>
+    <td class="px-2 py-1 text-end subject_mark align-middle"></td>
+    <td class="px-2 py-1 text-center align-middle">
+        <button class="btn btn-outline-danger mb-0 rounded-0 btn-sm rem-item py-1 px-3" type="button"><i class="fa fa-times"></i></button>
+    </td>
+</tr>
+</noscript>
+<script>
+    function calc_average() {
+        var mark_total = 0;
+        $('table#marks-list tbody tr').each(function() {
+            var mark = $(this).find('input[name="grade[]"]').val()
+            mark_total += parseFloat(mark)
+        })
+        $('#average').text(parseFloat(mark_total / $('table#marks-list tbody tr').length).toLocaleString('en-Us', {
+            style: 'decimal',
+            maximumFractionDigits: 2
+        }))
+    }
+    $(function() {
+        $('#uni_modal').on('shown.bs.modal', function() {
+            if ('{{ result.id }}' != '') {
+                calc_average()
+            }
+            $('#student').select2({
+                placeholder: "Please Select Student Here",
+                width: '100%',
+                dropdownParent: $('#uni_modal')
+            })
+            $('#subject').select2({
+                placeholder: "Please Select Subject Here",
+                width: '100%',
+                dropdownParent: $('#uni_modal')
+            })
+            $('#add_to_list').click(function() {
+                var subject_id = $("#subject").val()
+                var grade = $("#grade").val()
+                if (subject_id == '') {
+                    $("#subject").focus()
+                    return false
+                }
+                if (grade == '') {
+                    $("#grade").focus()
+                    return false
+                }
+                var subject = $('#subject option[value="' + (subject_id) + '"]').text()
+                var tr = $($('noscript#mark-item-clone').html()).clone()
+                tr.find("input[name='subject[]']").val(subject_id)
+                tr.find("input[name='grade[]']").val(grade)
+                tr.find(".subject_name").text(subject)
+                tr.find(".subject_mark").text(grade)
+                $('table#marks-list tbody').append(tr)
+                $("#subject").val("").trigger('change')
+                $("#grade").val("")
+                tr.find('.rem-item').click(function() {
+                    if (confirm("Are you sure to remove this from list?") === true) {
+                        tr.remove();
+                        calc_average()
+                    }
+                })
+                calc_average()
+            })
+            $('table#marks-list tbody tr').find('.rem-item').click(function() {
+                if (confirm("Are you sure to remove this from list?") === true) {
+                    $(this).closest('tr').remove();
+                    calc_average()
+                }
+            })
+        })
+        $('#result-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg text-light")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                url: "{% url 'save-result' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured ", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg ")
+                        location.reload()
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.html(resp.msg)
+                    } else {
+                        el.text("An error occured ", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal ").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>

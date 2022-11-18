@@ -1,0 +1,121 @@
+ {% load static %} {% load customfilter %}
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.0
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2021 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ MEDIA_URL }}/default/logo.png">
+    <link rel="icon" href="{{ MEDIA_URL }}/default/logo.png">
+    <title>
+        {{ page_title }} | {{ system_name }}
+    </title>
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+    <!-- Nucleo Icons -->
+    <link href="{% static 'plugins/material-dashboard/css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'plugins/material-dashboard/css/nucleo-svg.css' %}" rel="stylesheet" />
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'plugins/DataTables/datatables.min.css' %}" />
+
+
+    <!-- select2 -->
+    <link rel="stylesheet" href="{% static 'plugins/select2/dist/css/select2.min.css' %}">
+    <!-- Custom -->
+    <link rel="stylesheet" href="{% static 'default/css/style.css' %}">
+    <script src="{% static 'default/js/jquery-3.6.0.min.js' %}"></script>
+
+    <!-- DataTables -->
+    <script src="{% static 'plugins/DataTables/datatables.min.js' %}"></script>
+
+
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- CSS Files -->
+    <link id="pagestyle" href="{% static 'plugins/material-dashboard/css/material-dashboard.css' %}" rel="stylesheet" /> {% block stylesheets %}{% endblock stylesheets %}
+    <script type="text/javascript" src="{% static 'default/js/script.js' %}"></script>
+
+
+</head>
+
+<body class="g-sidenav-show bg-gray-200 dark-version">
+
+    {% if has_sidebar %} {% include 'includes/sidebar.html' %} {% endif %}
+
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+
+        {% if has_navigation %}{% include 'includes/navigation.html' %}{% endif %} {% if messages %}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.extra_tags %}{{ message.tags|replaceBlank:message.extra_tags|replaceBlank:' ' }}{% else %}{{ message.tags }}{% endif %} w-100 rounded-0 mb-2 redirect-msg">
+                        <div class="d-flex w-100">
+                            <div class="col-auto flex-shrink-1 flex-grow-1 text-light">{{ message|safe }}</div>
+                            <div class="col-auto text-center">
+                                <button class="btn-close btn-sm text-sm" type="button" onclick="$(this).closest('.alert').remove()"></button>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% if message.extra_tags != 'stay' %}
+                    <script>
+                        $(function() {
+                            if ($('.redirect-msg').length > 0) {
+                                setTimeout(() => {
+                                    $('.redirect-msg').hide('slideUp')
+                                    setTimeout(() => {
+                                        $('.redirect-msg').remove()
+                                    }, 500)
+                                }, 3500)
+                            }
+
+                        })
+                    </script>
+                    {% endif %} {% endfor %}
+                </div>
+            </div>
+        </div>{% endif %} {% block content %}{% endblock content %}
+
+    </main>
+    {% include 'includes/modals.html' %} {% include 'includes/fixed-plugin.html' %} {% include 'includes/scripts.html' %}
+
+    <!-- Specific Page JS goes HERE  -->
+    {% block javascripts %}{% endblock javascripts %}
+
+    <script>
+        var win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+            var options = {
+                damping: '0.5'
+            }
+            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="{% static 'plugins/material-dashboard/js/material-dashboard.min.js' %}"></script>
+    <!-- Select2 -->
+    <script src="{% static 'plugins/select2/dist/js/select2.min.js' %}"></script>
+
+</body>
+
+</html>

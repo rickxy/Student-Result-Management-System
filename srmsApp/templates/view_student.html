@@ -1,0 +1,31 @@
+{% load humanize %}
+<style>
+    #uni_modal .modal-footer {
+        display: none !important
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <dl>
+                <dt>Student ID/Code</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ student.student_id }}</dd>
+                <dt>Name</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ student.get_name }}</dd>
+                <dt>Gender</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ student.gender }}</dd>
+                <dt>Class</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ student.classI }}</dd>
+                <dt>Status</dt>
+                <dd class="ps-4 fw-bolder text-primary">
+                    {% if student.status == '1' %}
+                    <span class="badge badge-sm bg-primary text-sm px-4 py-1 bg-gradient rounded-pill">Active</span> {% elif student.status == '2' %}
+                    <span class="badge badge-sm bg-secondary text-sm px-4 py-1 bg-gradient rounded-pill">Inactive</span> {% endif %}
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="text-end mt-3">
+        <button class="btn btn-light bg-gradient btn-sm rounded-0 mb-0" type="button" data-bs-dismiss="modal"><i class="material-icons">close</i> Close</button>
+    </div>
+</div>

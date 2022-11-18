@@ -1,0 +1,60 @@
+{% load humanize %}
+<style>
+    #uni_modal .modal-footer {
+        display: none !important
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <dl>
+                <dt>Student ID/Code</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ result.student.student_id }}</dd>
+                <dt>Name</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ result.student.get_name }}</dd>
+                <dt>Gender</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ result.student.gender }}</dd>
+            </dl>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <dl>
+                <dt>Class</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ result.student.classI }}</dd>
+                <dt>Semester</dt>
+                <dd class="ps-4 fw-bolder text-primary">{{ result.semester }}</dd>
+            </dl>
+        </div>
+    </div>
+    <hr>
+    <table class="table table-bordered table-striped" id="marks-list">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <thead>
+            <tr class="bg-info bg-gradient">
+                <th class="px-2 py-1 text-center">Subject</th>
+                <th class="px-2 py-1 text-center">Mark</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mark in marks %}
+            <tr>
+                <td class="px-2 py-1 align-middle">
+                    <span class="subject_name">{{ mark.subject }}</span>
+                </td>
+                <td class="px-2 py-1 text-end subject_mark align-middle">{{ mark.grade }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="px-2 py-1"><b>Average</b></th>
+                <th class="px-2 py-1 fw-bolder text-end" id="average">{{ result.average }}</th>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="text-end mt-3">
+        <button class="btn btn-light bg-gradient btn-sm rounded-0 mb-0" type="button" data-bs-dismiss="modal"><i class="material-icons">close</i> Close</button>
+    </div>
+</div>

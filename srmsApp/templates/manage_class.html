@@ -1,0 +1,78 @@
+{% load customfilter %}
+<div class="container-fluid">
+    <form action=" " id="class-form">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ classData.id }}">
+        <div class="form-group mb-3 ">
+            <label for="level" class="control-label">Level</label>
+            <input type="text" class="form-control rounded-0" id="level" name="level" value="{{ classData.level }}" required>
+        </div>
+        <div class="form-group mb-3 ">
+            <label for="section" class="control-label">Section</label>
+            <input type="text" class="form-control rounded-0" id="section" name="section" value="{{ classData.section }}" required>
+        </div>
+        <div class="form-group mb-3 ">
+            <label for="status" class="control-label">Status</label>
+            <select name="status" id="status" class="form-select rounded-0" required="required">
+                {% if classData.status == '1' %}
+                <option value="1" selected>Active</option>
+                {% else %}
+                <option value="1">Active</option>
+                {% endif %}
+                {% if classData.status == '2' %}
+                <option value="2" selected>Inactive</option>
+                {% else %}
+                <option value="2">Inactive</option>
+                {% endif %}
+            </select>
+        </div>
+    </form>
+</div>
+<script>
+    $(function() {
+        $('#class-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg text-light")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                url: "{% url 'save-class' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured ", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg ")
+                        location.reload()
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.html(resp.msg)
+                    } else {
+                        el.text("An error occured ", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal ").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>

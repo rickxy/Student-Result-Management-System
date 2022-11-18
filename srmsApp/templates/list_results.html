@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html' %}{% load static %}{% block content %}
+<!-- <style>
+    main {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+    }
+</style> -->
+<div class="container py-5">
+    <div class="d-flex flex-column w-100 justify-content-center align-items-center">
+        <h3 class="fw-bolder text-center mb-5">{{ student }}'s Results</h3>
+        <div class="text-end">
+            <a href="{% url 'home-page' %}" class="btn btn-flat btn-light border btn-sm rounded-0 d-flex align-items-center"><span class="material-icons">arrow_back_ios_new</span> Back to Site</a>
+        </div>
+        <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+            <div class="card card-default rounded-0 shadow">
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="list-group rounded-0">
+                            {% for result in results %}
+                            <a href="javascript:void(0)" class="text-primary border border-light view_result list-group-item list-group-item-action d-flex aling-items-center" data-url="{% url 'view-result-pk' result.pk %}">
+                                <h4 class="col-11">{{ result.semester }} Result</h4>
+                                <div class="col-1 d-flex align-items-center justify-content-end"><span class="material-icons fs-3">preview</span></div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} {% block javascripts %}
+<script>
+    $(function() {
+        $('.view_result').click(function() {
+            uni_modal('<i class="material-icons">preview</i>Result Details', $(this).attr('data-url'), 'modal-xl')
+        })
+    })
+</script>
+{% endblock javascripts %}

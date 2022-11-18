@@ -1,0 +1,120 @@
+{% load customfilter %}
+<div class="container-fluid">
+    <form action=" " id="student-form">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ student.id }}">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="form-group mb-3 ">
+                    <label for="student_id" class="control-label">Student ID/Code</label>
+                    <input type="text" class="form-control rounded-0" id="student_id" name="student_id" value="{{ student.student_id }}" required>
+                </div>
+                <div class="form-group mb-3 ">
+                    <label for="first_name" class="control-label">First Name</label>
+                    <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ student.first_name }}" required>
+                </div>
+                <div class="form-group mb-3 ">
+                    <label for="middle_name" class="control-label">Middle Name</label>
+                    <input type="text" class="form-control rounded-0" id="middle_name" name="middle_name" value="{{ student.middle_name }}">
+                </div>
+                <div class="form-group mb-3 ">
+                    <label for="last_name" class="control-label">Last Name</label>
+                    <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ student.last_name }}" required>
+                </div>
+                <div class="form-group mb-3 ">
+                    <label for="gender" class="control-label">Gender</label>
+                    <select name="gender" id="gender" class="form-select rounded-0" required="required">
+                        {% if student.gender == '1' %}
+                        <option selected>Male</option>
+                        {% else %}
+                        <option>Male</option>
+                        {% endif %}
+                        {% if student.gender == '2' %}
+                        <option selected>Female</option>
+                        {% else %}
+                        <option>Female</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="form-group mb-3 ">
+                    <label for="classI" class="control-label">Class</label>
+                    <select name="classI" id="classI" class="form-select rounded-0" required="required">
+                        {% if not  student.classI %}
+                        <option value="" disabled selected>Please Select Here</option>
+                        {% endif %}
+                        {% for class in classes %}
+                        {% if student.classI.id == class.id %}
+                        <option value="{{ class.id }}" selected>{{ class }}</option>
+                        {% else %}
+                        <option value="{{ class.id }}">{{ class }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mb-3 ">
+                    <label for="status" class="control-label">Status</label>
+                    <select name="status" id="status" class="form-select rounded-0" required="required">
+                        {% if student.status == '1' %}
+                        <option value="1" selected>Active</option>
+                        {% else %}
+                        <option value="1">Active</option>
+                        {% endif %}
+                        {% if student.status == '2' %}
+                        <option value="2" selected>Inactive</option>
+                        {% else %}
+                        <option value="2">Inactive</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $(function() {
+        $('#student-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg text-light")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                url: "{% url 'save-student' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured ", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg ")
+                        location.reload()
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.html(resp.msg)
+                    } else {
+                        el.text("An error occured ", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal ").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>

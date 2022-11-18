@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %} {% load humanize %} {% load static %} {% load customfilter %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-4 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-info shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">view_list</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Classes</p>
+                <h4 class="mb-0">{{ classes|intcomma }}</h4>
+              </div>
+            </div>
+            {% comment %} <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than lask week</p>
+            </div> {% endcomment %}
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-4 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-warning shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">subject</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Subjects</p>
+                <h4 class="mb-0">{{ subjects|intcomma }}</h4>
+              </div>
+            </div>
+            {% comment %} <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than lask week</p>
+            </div> {% endcomment %}
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-4 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-primary shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">people_alt</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Students</p>
+                <h4 class="mb-0">{{ students|intcomma }}</h4>
+              </div>
+            </div>
+            {% comment %} <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than lask week</p>
+            </div> {% endcomment %}
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-4 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-success shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">table_view</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Results</p>
+                <h4 class="mb-0">{{ results|intcomma }}</h4>
+              </div>
+            </div>
+            {% comment %} <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than lask week</p>
+            </div> {% endcomment %}
+          </div>
+        </div>
+      </div>
+
+      {% include 'includes/footer.html' %}
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% endblock javascripts %}
